@@ -16,16 +16,17 @@ LifeHub is a web application designed to help users manage their lives efficient
 - **Notifications**: Firebase or OneSignal for real-time updates.
 - **Form Handling**: Flask-WTF for form processing and validation.
 
+## Project Structure
 LIFEHUB/
 │
 ├── application/
-│   ├── templates/      # HTML files (Jinja2 templates)
-│   ├── __init__.py     # Initialize Flask app and MongoDB connection
-│   ├── forms.py        # Form definitions
-│   ├── routes.py       # Routing logic for views
+│   ├── templates/
+│   ├── __init__.py
+│   ├── forms.py
+│   ├── routes.py
 │
-├── run.py              # Main entry point to run the app
-└── requirements.txt    # Python dependencies
+├── run.py
+└── requirements.txt
 
 ## Installation
 
