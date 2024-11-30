@@ -16,7 +16,6 @@ LifeHub is a web application designed to help users manage their lives efficient
 - **Notifications**: Firebase or OneSignal for real-time updates.
 - **Form Handling**: Flask-WTF for form processing and validation.
 
-## Project Structure
 LIFEHUB/
 │
 ├── application/
