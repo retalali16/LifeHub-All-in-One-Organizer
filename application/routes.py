@@ -1,8 +1,6 @@
 from application import app
 from flask import render_template, request, redirect, flash, url_for
-
 from bson import ObjectId
-
 from .forms import TodoForm
 from application import db
 from datetime import datetime
@@ -10,16 +8,25 @@ from datetime import datetime
 
 @app.route("/")
 def get_todos():
+    filter_option = request.args.get("filter", "all")  # Default to show all todos
     todos = []
-    for todo in db.todos_flask.find().sort("date_created", -1):
+
+    if filter_option == "completed":
+        query = {"completed": "True"}
+    elif filter_option == "not_completed":
+        query = {"completed": "False"}
+    else:
+        query = {}
+
+    for todo in db.todos_flask.find(query).sort("date_created", -1):
         todo["_id"] = str(todo["_id"])
         todo["date_created"] = todo["date_created"].strftime("%b %d %Y %H:%M:%S")
         todos.append(todo)
 
-    return render_template("view_todos.html", todos = todos)
-    
+    return render_template("view_todos.html", todos=todos, filter_option=filter_option)
 
-@app.route("/add_todo", methods = ['POST', 'GET'])
+
+@app.route("/add_todo", methods=["POST", "GET"])
 def add_todo():
     if request.method == "POST":
         form = TodoForm(request.form)
@@ -37,7 +44,7 @@ def add_todo():
         return redirect("/")
     else:
         form = TodoForm()
-    return render_template("add_todo.html", form = form)
+    return render_template("add_todo.html", form=form)
 
 
 @app.route("/delete_todo/<id>")
@@ -47,7 +54,7 @@ def delete_todo(id):
     return redirect("/")
 
 
-@app.route("/update_todo/<id>", methods = ['POST', 'GET'])
+@app.route("/update_todo/<id>", methods=["POST", "GET"])
 def update_todo(id):
     if request.method == "POST":
         form = TodoForm(request.form)
@@ -67,9 +74,8 @@ def update_todo(id):
         form = TodoForm()
 
         todo = db.todos_flask.find_one_or_404({"_id": ObjectId(id)})
-        print(todo)
         form.name.data = todo.get("name", None)
         form.description.data = todo.get("description", None)
-        form.completed.data = todo.get("completd", None)
+        form.completed.data = todo.get("completed", None)
 
-    return render_template("add_todo.html", form = form)
+    return render_template("add_todo.html", form=form)

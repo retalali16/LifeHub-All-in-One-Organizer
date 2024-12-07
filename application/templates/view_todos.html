@@ -1,21 +1,50 @@
 {% extends "layout.html" %}
 {% block content %}
-<div>
-    {% for todo in todos %}
-        <div class="card p-1 m-3">
-            <div class="card-body">
-                {% if todo.completed == "True" %}
-                <h5 class="card-title"><del>{{ todo.name }}</del></h5>
-                {% else %}
-                <h5 class="card-title">{{ todo.name }}</h5>
-                {% endif %}
-                <p class="card-text text-muted">{{ todo.date_created }}</p>
-                <p class="card-text">{{ todo.description }}</p>
-                
-                <a href="{{ url_for('update_todo', id = todo._id) }}" class="btn btn-info btn-sm">Update</a>
-                <a href="{{ url_for('delete_todo', id = todo._id) }}" class="btn btn-outline-danger btn-sm">Delete</a>
-            </div>
-        </div>
-    {% endfor %}
+<div class="d-flex justify-content-between align-items-center my-3">
+    <h2>Todo List</h2>
+    <form method="GET" action="/">
+        <select name="filter" class="form-control" onchange="this.form.submit()">
+            <option value="all" {% if filter_option == 'all' %}selected{% endif %}>All</option>
+            <option value="completed" {% if filter_option == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="not_completed" {% if filter_option == 'not_completed' %}selected{% endif %}>Not Completed</option>
+        </select>
+    </form>
 </div>
+
+<div class="alert alert-info" role="alert">
+    Showing: 
+    {% if filter_option == "completed" %}
+        Completed Tasks
+    {% elif filter_option == "not_completed" %}
+        Not Completed Tasks
+    {% else %}
+        All Tasks
+    {% endif %}
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Task Name</th>
+            <th>Description</th>
+            <th>Completed</th>
+            <th>Date Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for todo in todos %}
+        <tr>
+            <td>{{ todo.name }}</td>
+            <td>{{ todo.description }}</td>
+            <td>{{ todo.completed }}</td>
+            <td>{{ todo.date_created }}</td>
+            <td>
+                <a href="{{ url_for('update_todo', id=todo._id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{{ url_for('delete_todo', id=todo._id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
