@@ -8,7 +8,7 @@ from datetime import datetime
 
 @app.route("/")
 def get_todos():
-    filter_option = request.args.get("filter", "all")  # Default to show all todos
+    filter_option = request.args.get("filter", "all")
     todos = []
 
     if filter_option == "completed":
@@ -28,22 +28,49 @@ def get_todos():
 
 @app.route("/add_todo", methods=["POST", "GET"])
 def add_todo():
-    if request.method == "POST":
-        form = TodoForm(request.form)
-        todo_name = form.name.data
-        todo_description = form.description.data
-        completed = form.completed.data
-
-        db.todos_flask.insert_one({
-            "name": todo_name,
-            "description": todo_description,
-            "completed": completed,
-            "date_created": datetime.utcnow()
-        })
+    form = TodoForm(request.form)
+    if request.method == "POST" and form.validate():
+        todo_data = {
+            "name": form.name.data,
+            "description": form.description.data,
+            "completed": form.completed.data,
+            "due_date": form.due_date.data.strftime("%Y-%m-%d"),
+            "priority": form.priority.data,
+            "date_created": datetime.utcnow(),
+        }
+        db.todos_flask.insert_one(todo_data)
         flash("Todo successfully added", "success")
         return redirect("/")
-    else:
-        form = TodoForm()
+
+    return render_template("add_todo.html", form=form)
+
+
+@app.route("/update_todo/<id>", methods=["POST", "GET"])
+def update_todo(id):
+    form = TodoForm(request.form)
+    if request.method == "POST" and form.validate():
+        updated_data = {
+            "name": form.name.data,
+            "description": form.description.data,
+            "completed": form.completed.data,
+            "due_date": form.due_date.data.strftime("%Y-%m-%d") if form.due_date.data else None,
+            "priority": form.priority.data,
+        }
+        db.todos_flask.find_one_and_update({"_id": ObjectId(id)}, {"$set": updated_data})
+        flash("Todo successfully updated", "success")
+        return redirect("/")
+
+    todo = db.todos_flask.find_one({"_id": ObjectId(id)})
+    if todo:
+        form.name.data = todo.get("name")
+        form.description.data = todo.get("description")
+        form.completed.data = todo.get("completed")
+        form.due_date.data = (
+            datetime.strptime(todo.get("due_date"), "%Y-%m-%d") 
+            if todo.get("due_date") else None
+        )
+        form.priority.data = todo.get("priority")
+
     return render_template("add_todo.html", form=form)
 
 
@@ -52,30 +79,3 @@ def delete_todo(id):
     db.todos_flask.find_one_and_delete({"_id": ObjectId(id)})
     flash("Todo successfully deleted", "success")
     return redirect("/")
-
-
-@app.route("/update_todo/<id>", methods=["POST", "GET"])
-def update_todo(id):
-    if request.method == "POST":
-        form = TodoForm(request.form)
-        todo_name = form.name.data
-        todo_description = form.description.data
-        completed = form.completed.data
-
-        db.todos_flask.find_one_and_update({"_id": ObjectId(id)}, {"$set": {
-            "name": todo_name,
-            "description": todo_description,
-            "completed": completed,
-            "date_created": datetime.utcnow()
-        }})
-        flash("Todo successfully updated", "success")
-        return redirect("/")
-    else:
-        form = TodoForm()
-
-        todo = db.todos_flask.find_one_or_404({"_id": ObjectId(id)})
-        form.name.data = todo.get("name", None)
-        form.description.data = todo.get("description", None)
-        form.completed.data = todo.get("completed", None)
-
-    return render_template("add_todo.html", form=form)
