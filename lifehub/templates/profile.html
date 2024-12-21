@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<header>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</header>
+<body>
+    <div class="container">
+        <h2>Update Profile</h2>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data" id="profileForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user['username'] }}" required>
+            
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" value="{{ user['address'] }}">
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" value="{{ user['phone'] }}" oninput="validatePhone()" required>
+            <span id="phoneError" style="color: red; display: none;">Phone number must be exactly 11 digits.</span>
+
+            <label for="profile_picture">Profile Picture:</label>
+            <input type="file" id="profile_picture" name="profile_picture" onchange="previewImage(event)">
+            <input type="hidden" name="current_profile_picture" value="{{ user['profile_picture'] }}">
+            <br>
+            
+            <!-- Display current profile picture or the uploaded one -->
+            <img id="profilePreview" src="{{ url_for('static', filename=user['profile_picture']) }}" alt="Profile Picture" width="100"><br><br>
+            
+            <button type="submit">Update Profile</button>
+        </form>
+    </div>
+
+    <script>
+        // Preview the image before uploading
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                const preview = document.getElementById('profilePreview');
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Validate phone number for exactly 11 digits
+        function validatePhone() {
+            const phoneInput = document.getElementById('phone');
+            const phoneError = document.getElementById('phoneError');
+            const phoneValue = phoneInput.value;
+
+            if (!/^\d{11}$/.test(phoneValue)) {
+                phoneError.style.display = 'inline';
+                phoneInput.setCustomValidity("Phone number must be exactly 11 digits.");
+            } else {
+                phoneError.style.display = 'none';
+                phoneInput.setCustomValidity(""); // Remove the custom validity message
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('profileForm').addEventListener('submit', function(event) {
+            const phoneInput = document.getElementById('phone');
+            if (!/^\d{11}$/.test(phoneInput.value)) {
+                event.preventDefault(); // Prevent form submission if phone number is invalid
+                alert("Please enter a valid 11-digit phone number.");
+            }
+        });
+    </script>
+</body>
+</html>
