@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Activity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+<header>
+        <a href="{{ url_for('index') }}">Back to Home</a>
+</header>
+    <div class="container">
+        <h2>Log Activity</h2>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Activity logging form -->
+        <form method="POST" action="{{ url_for('log_activity') }}">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" name="weight" step="0.1" required>
+            
+            <label for="activity_type">Activity Type:</label>
+            <select id="activity_type" name="activity_type" required>
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+                <option value="walking">Walking</option>
+            </select>
+            
+            <label for="duration">Duration (minutes):</label>
+            <input type="number" id="duration" name="duration" step="1" required>
+            
+            <button type="submit">Calculate</button>
+        </form>
+        
+        <!-- Display activity logs -->
+        <h3>Activity Logs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Weight (kg)</th>
+                    <th>Activity Type</th>
+                    <th>Duration (minutes)</th>
+                    <th>Calories Burned</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.weight }}</td>
+                    <td>{{ log.activity_type }}</td>
+                    <td>{{ log.duration }}</td>
+                    <td>{{ log.calories_burned }}</td>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
