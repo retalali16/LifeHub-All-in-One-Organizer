@@ -1,6 +1,0 @@
-Flask==2.2.3
-pymongo==4.3.3
-smtplib==3.6.0  
-google-api-python-client==2.80.0
-python-dotenv==1.0.0
-apscheduler==3.9.1
