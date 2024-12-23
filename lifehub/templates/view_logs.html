@@ -1,0 +1,30 @@
+<!-- view_logs.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Activity Logs</title>
+</head>
+<body>
+    <h1>View Activity Logs</h1>
+    <table>
+        <tr>
+            <th>Weight</th>
+            <th>Activity Type</th>
+            <th>Duration (min)</th>
+            <th>Calories Burned</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log['weight'] }}</td>
+            <td>{{ log['activity_type'] }}</td>
+            <td>{{ log['duration'] }}</td>
+            <td>{{ log['calories_burned'] }}</td>
+            <td>{{ log['timestamp'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
