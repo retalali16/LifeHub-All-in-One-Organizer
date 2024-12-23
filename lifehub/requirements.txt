@@ -1,0 +1,9 @@
+Flask==2.2.3
+Flask-WTF==1.1.1
+google-api-python-client==2.101.0
+python-dotenv==1.0.0
+apscheduler==3.10.1
+pymongo==4.5.0
+flask-pymongo==2.3.0
+Werkzeug==2.2.3
+
