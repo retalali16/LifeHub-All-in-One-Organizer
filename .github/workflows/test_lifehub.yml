@@ -44,6 +44,7 @@ jobs:
           path: |
             release.zip
             !venv/
+      
 
   deploy:
     runs-on: windows-latest
@@ -61,7 +62,8 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        shell: powershell
+        run: Expand-Archive -Path release.zip -DestinationPath . -Force
 
       
       - name: Login to Azure
