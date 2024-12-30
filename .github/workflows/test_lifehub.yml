@@ -11,10 +11,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2  # Use a stable version
+      - uses: actions/checkout@v4
 
       - name: Set up Python version
-        uses: actions/setup-python@v2  # Use a stable version
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -34,7 +34,7 @@ jobs:
         run: Compress-Archive -Path * -DestinationPath release.zip -Force
 
       - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2  # Use a stable version
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: python-app
           path: release.zip
@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v2  # Use a stable version
+        uses: actions/download-artifact@v4  # Updated to v4
         with:
           name: python-app
 
@@ -58,21 +58,18 @@ jobs:
         shell: powershell
         run: Expand-Archive -Path release.zip -DestinationPath . -Force
       
-      - name: List files for debugging  # Added for troubleshooting
-        run: dir
-
       - name: Login to Azure
-        uses: azure/login@v1  # Use a stable version
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4F431E34DC854B91B1C5D37EC026C1AA }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0D0B2617D65D4A68BEB303A2C3305D9E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B4D04734A49A42168E93FC24BF9DD81F }}
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3  # Use a stable version
+        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'LifeHub'
           slot-name: 'Production'
           publish-profile: ${{ secrets.my_secret_2 }}
-          package: .  # Ensure this points to the correct directory
+          package: .
