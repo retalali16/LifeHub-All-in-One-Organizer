@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
             !venv/
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -75,4 +75,6 @@ jobs:
         with:
           app-name: 'LifeHub'
           slot-name: 'Production'
+          publish-profile: ${{ secrets.my_secret_2 }}
+          package: .
           
